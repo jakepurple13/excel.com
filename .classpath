@@ -25,6 +25,9 @@
 	<classpathentry kind="lib" path="/Users/Jacob/Downloads/poi-3.15/poi-excelant-3.15.jar"/>
 	<classpathentry kind="lib" path="/Users/Jacob/Downloads/poi-3.15/poi-ooxml-3.15.jar"/>
 	<classpathentry kind="lib" path="/Users/Jacob/Downloads/poi-3.15/poi-scratchpad-3.15.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry kind="lib" path="/Users/Jacob/Downloads/poi-3.15/lib/commons-collections4-4.1.jar"/>
+	<classpathentry kind="lib" path="/Users/Jacob/Downloads/poi-3.15/lib/commons-codec-1.10.jar"/>
+	<classpathentry kind="lib" path="/Users/Jacob/Downloads/poi-3.15/lib/commons-logging-1.2.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

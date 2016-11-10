@@ -3,6 +3,11 @@ package com.excel.excel.com;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.time.DateTimeException;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,7 +28,7 @@ import com.google.api.services.sheets.v4.model.Spreadsheet;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
 public class GoogleSheets {
-	
+
 	/** Application name. */
 	private final String APPLICATION_NAME = "Google Sheets API Java Quickstart";
 
@@ -40,7 +45,9 @@ public class GoogleSheets {
 	private final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
 
 	/** Global instance of the HTTP transport. */
-	private static  HttpTransport HTTP_TRANSPORT;
+	private static HttpTransport HTTP_TRANSPORT;
+
+	ArrayList<String> als = new ArrayList<>();
 
 	/**
 	 * Global instance of the scopes required by this quickstart.
@@ -59,48 +66,90 @@ public class GoogleSheets {
 			System.exit(1);
 		}
 	}
-	
+
 	public GoogleSheets() throws IOException {
 		// Build a new authorized API client service.
-				Sheets service = getSheetsService();
+		Sheets service = getSheetsService();
 
-				// Prints the names and majors of students in a sample spreadsheet:
-				// https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
-				String spreadsheetId = sheetID;
+		// Prints the names and majors of students in a sample spreadsheet:
+		// https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
+		String spreadsheetId = sheetID;
 
-				Spreadsheet response1 = service.spreadsheets().get(spreadsheetId).setIncludeGridData(false).execute();
+		Spreadsheet response1 = service.spreadsheets().get(spreadsheetId).setIncludeGridData(false).execute();
 
-				List<Sheet> workSheetList = response1.getSheets();
+		List<Sheet> workSheetList = response1.getSheets();
 
-				for (Sheet sheet : workSheetList) {
-					System.err.println(sheet.getProperties().getTitle());
+		for (Sheet sheet : workSheetList) {
+			System.err.println(sheet.getProperties().getTitle());
+			String sheetName = sheet.getProperties().getTitle();
+			String range = sheetName + "!A1:BG100";// "A4:E20";//BG
+			ValueRange response = service.spreadsheets().values().get(spreadsheetId, range).execute();
+			List<List<Object>> values = response.getValues();
 
-					String range = sheet.getProperties().getTitle() + "!A1:BG20";// "A4:E20";//BG
-					ValueRange response = service.spreadsheets().values().get(spreadsheetId, range).execute();
-					List<List<Object>> values = response.getValues();
-					if (values == null || values.size() == 0) {
-						System.out.println("No data found.");
-					} else {
-						System.out.println("Size is: " + values.size());
+			if (values == null || values.size() == 0) {
+				System.out.println("No data found.");
+			} else {
+				// System.out.println("Size is: " + values.size());
 
-						for (int i = 0; i < values.size(); i++) {
-							for (int j = 0; j < values.get(i).size(); j++) {
-								System.out.print(values.get(i).get(j) + "\t");
+				for (int i = 0; i < values.size(); i++) {
+
+					List<Object> lo = values.get(i);
+
+					for (int j = 0; j < lo.size(); j++) {
+						System.out.print(lo.get(j) + "\t");
+					}
+
+					System.out.println();
+
+					if (i >= 4) {
+
+						switch (sheetName) {
+						case "Summary":
+
+							break;
+
+						case "supervisors":
+
+							break;
+
+						default:
+							// System.err.println("-------------------");
+							// als.add("-------------------");
+							als.add(lo.get(0) + "\t" + sheetName + "\t" + lo.get(1) + "\t" + lo.get(2));
+							try {
+								DateTimeFormatter parseFormat = new DateTimeFormatterBuilder().appendPattern("hh:mm a")
+										.toFormatter();
+
+								LocalTime lt = LocalTime.parse(lo.get(1).toString(), parseFormat);
+								System.err.println(lt);
+							} catch (DateTimeException e) {
+
 							}
-							System.out.println();
+							// als.add("-------------------");
+							// System.out.println(lo.get(0) + "\t" + sheetName +
+							// "\t" + lo.get(1) + "\t" + lo.get(2));
+							// System.err.println("-------------------");
+							break;
 						}
 
-						/*
-						 * for (List row : values) { // Print columns A and E, which
-						 * correspond to indices 0 and 4.
-						 * //System.out.printf("%s, %s\n", row.get(0), row.get(2));
-						 * System.out.println(row.get(0)); }
-						 */
 					}
 
 				}
+
+				/*
+				 * for (List row : values) { // Print columns A and E, which
+				 * correspond to indices 0 and 4.
+				 * //System.out.printf("%s, %s\n", row.get(0), row.get(2));
+				 * System.out.println(row.get(0)); }
+				 */
+			}
+
+		}
 	}
-	
+
+	public ArrayList<String> getList() {
+		return als;
+	}
 
 	/**
 	 * Creates an authorized Credential object.
@@ -132,6 +181,5 @@ public class GoogleSheets {
 		return new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential).setApplicationName(APPLICATION_NAME)
 				.build();
 	}
-	
-	
+
 }
