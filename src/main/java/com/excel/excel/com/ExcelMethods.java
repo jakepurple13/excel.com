@@ -50,32 +50,36 @@ import com.google.api.services.sheets.v4.model.ValueRange;
 
 public class ExcelMethods {
 
-	final int NAME = 0; //the column of the name
-	final int TIMEIN = 5; //column of the starting time
-	final int TIMEOUT = 6; //column of the ending time
+	final int NAME = 0; // the column of the name
+	final int TIMEIN = 5; // column of the starting time
+	final int TIMEOUT = 6; // column of the ending time
 
 	final int DAY = 1;
 	final int STARTTIME = 2;
 	final int ENDTIME = 3;
-	
-	HashMap<String, Student> hmss; //Hashmap of Name and Student
-	ArrayList<Exception> badThings; //ArrayList of any exceptions that go wrong
-	ArrayList<String> timing; 
-	ArrayList<Date> starting; //The start times
-	ArrayList<Date> ending; //The end times
-	ArrayList<WorkTime> workTime; //
-	
-	String timeReadInName = "schedules_on_kronos_201670.xls"; //read in sheet
-	String realReadInName = "EmployeeTimeDetail_PayPeriodEnd10-15-16.xlsx"; //read in sheet
 
-	ArrayList<String> name = new ArrayList<String>(); //list of names - probably will go away in the future
+	HashMap<String, Student> hmss; // Hashmap of Name and Student
+	ArrayList<Exception> badThings; // ArrayList of any exceptions that go wrong
+	ArrayList<String> timing;
+	ArrayList<Date> starting; // The start times
+	ArrayList<Date> ending; // The end times
+	ArrayList<WorkTime> workTime; //
+
+	String timeReadInName = "schedules_on_kronos_201670.xls"; // read in sheet
+	String realReadInName = "EmployeeTimeDetail_PayPeriodEnd10-15-16.xlsx"; // read
+																			// in
+																			// sheet
+
+	ArrayList<String> name = new ArrayList<String>(); // list of names -
+														// probably will go away
+														// in the future
 	ArrayList<String> als = new ArrayList<>();
 	ArrayList<Student> studentList = new ArrayList<>();
-	
+
 	/** Application name. */
 	private final String APPLICATION_NAME = "Google Sheets API Java Quickstart";
 
-	String sheetID = "1jQzehm5To1ZDM-m0B3mI6EfFChny6rFCDlP2Svn_6o0";
+	String sheetID = "1rZefKtvbZRil7x1JlGxPU-NMEpRTIwQaFGQHht_0K-I";// "1jQzehm5To1ZDM-m0B3mI6EfFChny6rFCDlP2Svn_6o0";
 
 	/** Directory to store user credentials for this application. */
 	private final static java.io.File DATA_STORE_DIR = new java.io.File(System.getProperty("user.home"),
@@ -162,15 +166,15 @@ public class ExcelMethods {
 		getGoogleSheetsStuff();
 
 	}
-	
-	
+
 	/*
 	 * getGoogleSheetsStuff - gets data from the google sheet
 	 * 
 	 */
 	public void getGoogleSheetsStuff() throws IOException {
 
-		HashMap<String, String> idGetter = new HashMap<>(); // idGetter<Name, UID>
+		HashMap<String, String> idGetter = new HashMap<>(); // idGetter<Name,
+															// UID>
 		// Build a new authorized API client service.
 		Sheets service = getSheetsService();
 		// Prints the names and majors of students in a sample spreadsheet:
@@ -180,41 +184,62 @@ public class ExcelMethods {
 		Spreadsheet response1 = service.spreadsheets().get(spreadsheetId).setIncludeGridData(false).execute();
 
 		List<com.google.api.services.sheets.v4.model.Sheet> workSheetList = response1.getSheets();
-		//Going through each sheet in the Google Sheet
+		// Going through each sheet in the Google Sheet
 		for (com.google.api.services.sheets.v4.model.Sheet sheet : workSheetList) {
 			System.err.println(sheet.getProperties().getTitle());
-			String sheetName = sheet.getProperties().getTitle(); //The sheet name
-			String range = sheetName + "!A1:BG100";// "A4:E20";//BG //The wanted range
+			String sheetName = sheet.getProperties().getTitle(); // The sheet
+																	// name
+			String range = sheetName + "!A1:BG100";// "A4:E20";//BG //The wanted
+													// range
 			ValueRange response = service.spreadsheets().values().get(spreadsheetId, range).execute();
 			List<List<Object>> values = response.getValues();
-			
+
 			if (values == null || values.size() == 0) {
 				System.out.println("No data found.");
 			} else {
-				
-				//Going through each row
+
+				// Going through each row
 				for (int i = 0; i < values.size(); i++) {
 
-					List<Object> row = values.get(i);//The row
-					
-					//Going through each row
+					List<Object> row = values.get(i);// The row
+
+					// Going through each row
 					for (int j = 0; j < row.size(); j++) {
 						System.out.print(row.get(j) + "\t");
 					}
 
 					System.out.println();
 
-					//If we are past row 7 because that's when name's start
+					// If we are past row 7 because that's when name's start
 					if (i >= 7) {
 
 						switch (sheetName) {
 						case "Summary":
 							// Add everyone's UID and Name to a hashmap here
 							// if(i>=7)
-							idGetter.put(row.get(0).toString(), row.get(0).toString());
+
+							if (i <= 40) {
+
+								if (!row.get(0).equals("")) {
+
+									System.err.println(row.get(12) + "\t");
+
+									idGetter.put(row.get(0).toString(), row.get(12).toString());
+
+								}
+							}
+
 							break;
 
 						case "supervisors":
+
+							break;
+
+						case "Hours":
+
+							break;
+
+						case "Variables":
 
 							break;
 
@@ -225,7 +250,7 @@ public class ExcelMethods {
 							// 1 -> In Time
 							// 2 -> Out Time
 
-							als.add(row.get(0) + "\t" + sheetName + "\t" + row.get(1) + "\t" + row.get(2));
+							//als.add(row.get(0) + "\t" + sheetName + "\t" + row.get(1) + "\t" + row.get(2));
 
 							// System.err.println(i + ": " + lo.get(0) + "\t" +
 							// sheetName + "\t" + lo.get(1) + "\t" + lo.get(2) +
@@ -236,18 +261,22 @@ public class ExcelMethods {
 								DateTimeFormatter parseFormat = new DateTimeFormatterBuilder().appendPattern("h:mm a")
 										.toFormatter();
 
-								LocalTime start = LocalTime.parse(row.get(1).toString(), parseFormat); //The startTime
-								LocalTime end = LocalTime.parse(row.get(2).toString(), parseFormat); //The endTime
-								String name = idGetter.get(row.get(0).toString()); //The UID
-								
-								//If our map has the uid, add a new time
+								LocalTime start = LocalTime.parse(row.get(1).toString(), parseFormat); // The
+																										// startTime
+								LocalTime end = LocalTime.parse(row.get(2).toString(), parseFormat); // The
+																										// endTime
+								String name = idGetter.get(row.get(0).toString()); // The UID
+
+								// If our map has the uid, add a new time
 								if (hmss.containsKey(name)) {
 									hmss.get(name).addTime(sheetName, start, end);
-								} else { //otherwise, make a new student and add it to the map
+								} else { // otherwise, make a new student and
+											// add it to the map
 									Student s = new Student(name);
 									s.addTime(sheetName, start, end);
 									hmss.put(name, s);
 									studentList.add(s);
+									als.add(row.get(0).toString());
 								}
 
 							}
