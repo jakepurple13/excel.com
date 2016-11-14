@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import com.google.api.client.auth.oauth2.Credential;
@@ -48,6 +49,10 @@ public class GoogleSheets {
 	private static HttpTransport HTTP_TRANSPORT;
 
 	ArrayList<String> als = new ArrayList<>();
+
+	ArrayList<Student> studentList = new ArrayList<>();
+
+	HashMap<String, Student> hmss = new HashMap<>();
 
 	/**
 	 * Global instance of the scopes required by this quickstart.
@@ -101,7 +106,7 @@ public class GoogleSheets {
 
 					System.out.println();
 
-					if (i >= 4) {
+					if (i >= 7) {
 
 						switch (sheetName) {
 						case "Summary":
@@ -115,20 +120,34 @@ public class GoogleSheets {
 						default:
 							// System.err.println("-------------------");
 							// als.add("-------------------");
+							// 0 -> Name
+							// 1 -> In Time
+							// 2 -> Out Time
 							als.add(lo.get(0) + "\t" + sheetName + "\t" + lo.get(1) + "\t" + lo.get(2));
-							try {
-								DateTimeFormatter parseFormat = new DateTimeFormatterBuilder().appendPattern("hh:mm a")
+
+							//System.err.println(i + ": " + lo.get(0) + "\t" + sheetName + "\t" + lo.get(1) + "\t" + lo.get(2) + "\tis a go!");
+
+						
+								
+							if(!lo.get(1).toString().equals("")) {
+								
+								DateTimeFormatter parseFormat = new DateTimeFormatterBuilder().appendPattern("h:mm a")
 										.toFormatter();
 
-								LocalTime lt = LocalTime.parse(lo.get(1).toString(), parseFormat);
-								System.err.println(lt);
-							} catch (DateTimeException e) {
+								LocalTime start = LocalTime.parse(lo.get(1).toString(), parseFormat);
+								LocalTime end = LocalTime.parse(lo.get(2).toString(), parseFormat);
+								String name = lo.get(0).toString();
 
+								Student s = new Student(name);
+
+								s.addTime(sheetName, start, end);
+
+								hmss.put(name, s);
+
+								studentList.add(s);
+								
 							}
-							// als.add("-------------------");
-							// System.out.println(lo.get(0) + "\t" + sheetName +
-							// "\t" + lo.get(1) + "\t" + lo.get(2));
-							// System.err.println("-------------------");
+							
 							break;
 						}
 
@@ -149,6 +168,10 @@ public class GoogleSheets {
 
 	public ArrayList<String> getList() {
 		return als;
+	}
+
+	public ArrayList<Student> getStudentList() {
+		return studentList;
 	}
 
 	/**
