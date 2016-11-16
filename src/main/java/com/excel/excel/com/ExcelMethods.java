@@ -272,7 +272,7 @@ public class ExcelMethods {
 									hmss.get(name).addTime(sheetName, start, end);
 								} else { // otherwise, make a new student and
 											// add it to the map
-									Student s = new Student(name);
+									Student s = new Student(name, row.get(0).toString());
 									s.addTime(sheetName, start, end);
 									hmss.put(name, s);
 									studentList.add(s);
@@ -536,7 +536,7 @@ public class ExcelMethods {
 				outDifferenceCell.setCellValue(workTime.get(count - 1).getOut());
 
 				// count++;
-
+				
 			}
 
 		}
@@ -550,7 +550,7 @@ public class ExcelMethods {
 		flagShip.autoSizeColumn(5);
 
 		SheetConditionalFormatting sheetCF = flagShip.getSheetConditionalFormatting();
-		ConditionalFormattingRule rule1 = sheetCF.createConditionalFormattingRule(ComparisonOperator.GT, "10");
+		ConditionalFormattingRule rule1 = sheetCF.createConditionalFormattingRule(ComparisonOperator.BETWEEN, "10", "50");
 		PatternFormatting fill1 = rule1.createPatternFormatting();
 		fill1.setFillBackgroundColor(IndexedColors.ROSE.index);
 		fill1.setFillPattern(PatternFormatting.SOLID_FOREGROUND);
@@ -562,36 +562,60 @@ public class ExcelMethods {
 		// -------------------------------
 
 		Sheet allTime = flagged.createSheet("Times");
+		
+		categories = allTime.createRow(0);
 
-		for (int i = 0; i < starting.size(); i++) {
+		cat = categories.createCell(NAME);
+		cat.setCellValue("Name");
+
+		cat = categories.createCell(1);
+		cat.setCellValue("Days of Work");
+
+		cat = categories.createCell(2);
+		cat.setCellValue("Starting Time");
+
+		cat = categories.createCell(3);
+		cat.setCellValue("Ending Time");
+
+		cat = categories.createCell(4);
+		cat.setCellValue("In Difference");
+
+		cat = categories.createCell(5);
+		cat.setCellValue("Out Difference");
+
+		for (int i = 1; i < starting.size(); i++) {
 
 			try {
 
+				Student nameKey = hmss.get(name.get(i-1));
 				// Create a row and put some cells in it. Rows are 0 based.
 				Row row = allTime.createRow(i);
 				// Create a cell and put a value in it.
 				Cell nameCell = row.createCell(0);
-				nameCell.setCellValue(name.get(i));
+				nameCell.setCellValue(nameKey.getNameAndUID());
+				
+				System.err.println(i-1 + ": " + name.get(i-1));
+				//System.out.println("Starting: " + nameKey.getDays(starting.get(i)).toString());
 
 				Cell startingCell = row.createCell(1);
-				startingCell.setCellValue(starting.get(i).toString());
-
+				startingCell.setCellValue(starting.get(i-1).toString());
+				
 				Cell endingCell = row.createCell(2);
-				endingCell.setCellValue(ending.get(i).toString());
+				endingCell.setCellValue(ending.get(i-1).toString());
 
 				Cell workTimeInCell = row.createCell(3);
-				workTimeInCell.setCellValue(workTime.get(i).getIn());
+				workTimeInCell.setCellValue(workTime.get(i-1).getIn());
 
 				Cell workTimeOutCell = row.createCell(4);
-				workTimeOutCell.setCellValue(workTime.get(i).getOut());
+				workTimeOutCell.setCellValue(workTime.get(i-1).getOut());
 
 				Cell tester = row.createCell(5);
 
-				String named = name.get(i);
+				String named = name.get(i-1);
 				System.out.println(named);
-				Date d = starting.get(i);
+				Date d = starting.get(i-1);
 				System.err.println(d.toString());
-				Student s = hmss.get(name.get(i));
+				Student s = hmss.get(name.get(i-1));
 				System.err.println(s);
 				Times t = s.getDays(d);
 				System.out.println(t.toString());
@@ -599,13 +623,13 @@ public class ExcelMethods {
 				tester.setCellValue(t.toString());
 
 			} catch (NullPointerException e) {
-				new MissingPersonException(name.get(i) + "\t" + e.toString(), badThings);
+				new MissingPersonException(name.get(i-1) + "\t" + e.toString(), badThings);
 			}
 
 		}
 
 		SheetConditionalFormatting sheetAT = allTime.getSheetConditionalFormatting();
-		ConditionalFormattingRule rule2 = sheetAT.createConditionalFormattingRule(ComparisonOperator.GT, "10");
+		ConditionalFormattingRule rule2 = sheetAT.createConditionalFormattingRule(ComparisonOperator.BETWEEN, "10", "50");
 		PatternFormatting fill2 = rule2.createPatternFormatting();
 		fill2.setFillBackgroundColor(IndexedColors.RED.index);
 		fill2.setFillPattern(PatternFormatting.SOLID_FOREGROUND);

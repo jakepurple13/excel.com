@@ -98,10 +98,10 @@ public class GoogleSheets {
 
 				for (int i = 0; i < values.size(); i++) {
 
-					List<Object> lo = values.get(i);
+					List<Object> row = values.get(i);
 
-					for (int j = 0; j < lo.size(); j++) {
-						System.out.print(lo.get(j) + "\t");
+					for (int j = 0; j < row.size(); j++) {
+						System.out.print(row.get(j) + "\t");
 					}
 
 					System.out.println();
@@ -123,20 +123,20 @@ public class GoogleSheets {
 							// 0 -> Name
 							// 1 -> In Time
 							// 2 -> Out Time
-							als.add(lo.get(0) + "\t" + sheetName + "\t" + lo.get(1) + "\t" + lo.get(2));
+							als.add(row.get(0) + "\t" + sheetName + "\t" + row.get(1) + "\t" + row.get(2));
 
 							//System.err.println(i + ": " + lo.get(0) + "\t" + sheetName + "\t" + lo.get(1) + "\t" + lo.get(2) + "\tis a go!");
 
 						
 								
-							if(!lo.get(1).toString().equals("")) {
+							if(!row.get(1).toString().equals("")) {
 								
 								DateTimeFormatter parseFormat = new DateTimeFormatterBuilder().appendPattern("h:mm a")
 										.toFormatter();
 
-								LocalTime start = LocalTime.parse(lo.get(1).toString(), parseFormat);
-								LocalTime end = LocalTime.parse(lo.get(2).toString(), parseFormat);
-								String name = lo.get(0).toString();
+								LocalTime start = LocalTime.parse(row.get(1).toString(), parseFormat);
+								LocalTime end = LocalTime.parse(row.get(2).toString(), parseFormat);
+								String name = row.get(0).toString();
 
 								Student s = new Student(name);
 

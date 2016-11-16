@@ -4,8 +4,10 @@ import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -15,6 +17,8 @@ import javax.swing.JFileChooser;
 import javax.swing.SpringLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
 
 public class ExcelGUI extends JFrame {
 
@@ -48,7 +52,11 @@ public class ExcelGUI extends JFrame {
 	JButton btnBegin;
 	JLabel lblOutput;
 	JLabel lblNewLabel;
-
+	
+	ByteArrayOutputStream baos;
+	PrintStream old;
+	private JTextPane txtpnStuff;
+	
 	/**
 	 * Create the frame.
 	 * @throws IOException 
@@ -89,9 +97,28 @@ public class ExcelGUI extends JFrame {
 		sl_contentPane.putConstraint(SpringLayout.EAST, lblOutput, 0, SpringLayout.EAST, lblNewLabel);
 		contentPane.add(lblOutput);
 
+		 // Create a stream to hold the output
+	    /*baos = new ByteArrayOutputStream();
+	    PrintStream ps = new PrintStream(baos);
+	    // IMPORTANT: Save the old System.out!
+	    old = System.out;
+	    // Tell Java to use your special stream
+	    System.setOut(ps);*/
+		
 		em = new ExcelMethods();
 
 		btnBegin.setEnabled(false);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		sl_contentPane.putConstraint(SpringLayout.NORTH, scrollPane, 16, SpringLayout.SOUTH, lblNewLabel);
+		sl_contentPane.putConstraint(SpringLayout.WEST, scrollPane, 5, SpringLayout.WEST, lblNewLabel);
+		sl_contentPane.putConstraint(SpringLayout.SOUTH, scrollPane, -3, SpringLayout.NORTH, lblOutput);
+		sl_contentPane.putConstraint(SpringLayout.EAST, scrollPane, 0, SpringLayout.EAST, lblNewLabel);
+		contentPane.add(scrollPane);
+		
+		txtpnStuff = new JTextPane();
+		txtpnStuff.setText("Stuff");
+		scrollPane.setViewportView(txtpnStuff);
 
 		btnRealTimeFile.addActionListener(new ActionListener() {
 
@@ -140,9 +167,21 @@ public class ExcelGUI extends JFrame {
 				}
 
 				isEverythingGood();
-
+				
+				 
+			    // Print some output: goes to your special stream
+			    //System.out.println("Foofoofoo!");
+			    // Put things back
+			    //System.out.flush();
+			    //System.setOut(old);
+			    // Show what happened
+			    //System.out.println("Here: " + baos.toString());
+				
+				//txtpnStuff.setText(baos.toString());
 			}
 		});
+		
+		
 
 		btnBegin.addActionListener(new ActionListener() {
 
@@ -150,7 +189,7 @@ public class ExcelGUI extends JFrame {
 				// TODO Auto-generated method stub
 				em.actualIn(fileName);
 				em.outWrite(outWriteName);
-
+				
 				contentPane.setBackground(Color.GREEN);
 			}
 		});
@@ -162,5 +201,4 @@ public class ExcelGUI extends JFrame {
 			btnBegin.setEnabled(true);
 		}
 	}
-
 }

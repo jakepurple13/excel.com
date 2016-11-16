@@ -11,14 +11,25 @@ import java.util.HashMap;
 public class Student {
 
 	ArrayList<Times> time;
+	String UID;
 	String name;
 	HashMap<String, Times> workTime;
 
-	public Student(String name) {
+	public Student(String UID, String name) {
 
-		this.name = name;
+		this.UID = UID;
 		time = new ArrayList<Times>();
 		workTime = new HashMap<String, Times>();
+		this.name = name;
+		
+	}
+	
+	public Student(String UID) {
+
+		this.UID = UID;
+		time = new ArrayList<Times>();
+		workTime = new HashMap<String, Times>();
+		name = "";
 		
 	}
 
@@ -119,11 +130,15 @@ public class Student {
 		}
 
 	}
+	
+	public String getNameAndUID() {
+		return "Name: " + name + " UID: " + UID;
+	}
 
 	@Override
 	public String toString() {
 
-		String info = name;
+		String info = UID;
 
 		for (Times t : time) {
 			info += "\t" + t;
